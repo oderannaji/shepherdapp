@@ -21,6 +21,6 @@ Verification:
 - Actual anonymous HTTP requests to the people endpoint and follow-up/date functions returned 401 / permission denied.
 - The local integration suite reproduced direct anonymous function grants before applying the second migration, then checked that they were removed. Local tests also verify that a prepared, unconfirmed account can accept an invitation, confirm its email, choose a password and sign in with it.
 
-No contact data or test fixtures were seeded into the hosted project. User sign-in with the real administrator account is still unverified. GitHub write access still returns 403, so the updated code has not been delivered to the Mac. Complete code delivery before sending an expiring setup email that redirects to the local app. Sending that email needs the user's explicit instruction.
+No contact data or test fixtures were seeded into the hosted project. User sign-in with the real administrator account is still unverified. GitHub access was restored on 13 October 2026, and the connected implementation is available on `oderannaji/shepherdapp`'s `main` branch. The user still needs to download or pull that version, configure the public Supabase connection values and start the app on their Mac before an expiring setup email can redirect there. Sending that email needs the user's explicit instruction.
 
 Run `bun run check:hosted -- your-admin-email@example.com` for a read-only recheck. Tokens stay in secure environment settings. This command uses the environment's supported proxy route; never disable TLS verification.
