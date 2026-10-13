@@ -31,6 +31,6 @@ Shared code must not import feature screens. Admin composes its own sections and
 
 ## Connected mode
 
-`identity` owns Supabase session, membership and MFA handling. Its public exports are `IdentityGate`, `useWorkspace`, `connection`, `membershipSchema` and the `Membership` type. `ConnectedApp.tsx` composes the gate and supported routes. `src/lib/connection-config.ts` validates public configuration in both Vite and the app. SQL migrations own authoritative permissions, validation and atomic saves.
+`identity` owns Supabase sessions, memberships, MFA, invitation acceptance and password reset. Password UI and link-state helpers stay private to that module. Its public exports are `IdentityGate`, `useWorkspace`, `connection`, `membershipSchema` and the `Membership` type. `ConnectedApp.tsx` composes the gate and supported routes. `src/lib/connection-config.ts` validates public configuration in both Vite and the app. SQL migrations own authoritative permissions, validation and atomic saves.
 
 Connected mode uses real records and account roles; it does not mount DemoProvider or expose the demo role switcher. Shared demo helpers stay independent of identity. Read `SUPABASE-SETUP.md` for the connected workflow and remaining modules.

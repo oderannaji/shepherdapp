@@ -1,13 +1,13 @@
 # Connect Shepherd to Supabase
 
-This adds real sign-in, account permissions, people and durable follow-up notes to the existing app. The original fictional demo remains available. Recovery, Expected, attendance imports, invitations/password-reset screens, assignment changes and the other Admin sections still need backend work.
+This adds real sign-in, account permissions, people and durable follow-up notes to the existing app. The original fictional demo remains available. Recovery, Expected, attendance imports, administrator invitation management, assignment changes and the other Admin sections still need backend work. Account invitation acceptance and password reset are implemented.
 
 ## Use your existing hosted project
 
 Your project URL is `https://qcejhbyrqvzqxhufexnn.supabase.co`. No hosted schema or data has been changed by this implementation.
 
 1. Review `supabase/migrations/20261013000100_shepherd_identity_follow_up.sql` with your project's existing schema. Back up an existing database before applying migrations. The migration creates new `shepherd_*` tables and a `shepherd_private` schema. It does not alter existing application tables. Apply it once through a reviewed Supabase migration or the SQL editor. Do not run `db reset` against a hosted database.
-2. In Supabase Authentication settings, enable email/password login, disable public user registration, require email confirmation, and enable authenticator (TOTP) MFA. The local `config.toml` does **not** change these hosted settings. Create the first confirmed account using trusted administrative tooling; this version's sign-in form expects an existing password. Invitation acceptance and password reset screens are not yet implemented.
+2. In Supabase Authentication settings, enable email/password login, disable public user registration, require email confirmation, and enable authenticator (TOTP) MFA. The local `config.toml` does **not** change these hosted settings. Create or invite the first account through trusted administrative tooling. Invitation links open a password setup screen. Existing users can select **Forgot password?** on the sign-in screen. Configure the exact app address as an allowed redirect URL; for Mac development add `http://localhost:3000/` and/or `http://127.0.0.1:3000/`, matching the address you actually use. Do not replace redirect URLs belonging to another application. No real invitation email has been sent by this setup.
 3. Use `supabase/bootstrap.example.sql` as a reviewed SQL-editor template to create the organisation and first administrator membership. Replace the example email with that confirmed account's email. Membership roles are stored in the database. Never grant a role through browser metadata. Additional confirmed users need active memberships; administrators can then add people and select their permanent owner in the app.
 4. In the folder containing `package.json`, copy `.env.example` to `.env.local`. Set:
 
@@ -23,7 +23,13 @@ Your project URL is `https://qcejhbyrqvzqxhufexnn.supabase.co`. No hosted schema
 
 Node and Bun are installed on your **Mac**. VS Code's terminal uses those installations. Run the commands from the Shepherd folder, not your home directory. Run `pwd` and `ls package.json` to check your location.
 
-Cloud environment settings have the same three variable requirements saved. Enter the publishable key there, review/save the settings, then publish the environment to apply them. The project hostname is also saved as a network requirement. A saved draft does not connect the running app or apply the database migration.
+The cloud environment now has the three app variables, and a read-only check reached this Supabase project successfully. The hosted Shepherd tables are still missing. A separate `SUPABASE_ACCESS_TOKEN` requirement is saved for administrative setup, restricted to `api.supabase.com`; enter a management token in secure environment settings and save/publish before running the hosted preflight. Never use that token in a `VITE_` variable or paste it into chat. Saving a configuration draft does not apply the database migration.
+
+## Inspect the hosted project before applying changes
+
+With `SUPABASE_ACCESS_TOKEN` securely available, run `node scripts/hosted-preflight.mjs your-admin-email@example.com`. This helper is deliberately bound to the supplied Shepherd project. It reads table metadata, checks whether the designated administrator exists, and reports only the login settings that need changes. It does not print credentials, user records or SMTP secrets, and it does not change the project. If unrelated public tables exist, review whether the project is shared before changing project-wide authentication settings.
+
+After a reviewed migration and membership bootstrap, verify login using your own browser. Enter your own password there. The assistant does not need your password. The browser's publishable key alone cannot create schema, grant administrator membership or configure project authentication.
 
 ## Local development and integration tests
 
@@ -46,6 +52,8 @@ For the optional browser smoke test, install Python Playwright and its Chromium 
 
 Cloud-specific tooling and proxy instructions are saved in the environment startup configuration. They are not required on your Mac.
 
+For invitation and recovery coverage, run `SUPABASE_HOME=/workspace/.cache/supabase node scripts/password-fixtures.mjs` in the cloud (omit the environment prefix on a Mac), then `CHROMIUM_PATH=/usr/bin/chromium python scripts/browser-passwords.py` while the local app runs. The helper creates only local accounts and writes generated links to ignored `.local/password-links.json`; never print or commit those links. The browser test verifies password creation after an invite, refresh during setup, a subsequent password login, recovery, expired callbacks and recovery with existing MFA. Reset-request email is captured by the local mail service, not sent externally.
+
 ## Permission and storage behaviour
 
 - Anonymous and unconfirmed accounts cannot read contacts. Volunteers can read and update only their own assigned contacts. Database checks run on every request, including direct API requests. Deactivating membership blocks subsequent API access with an already-issued token.
@@ -53,4 +61,6 @@ Cloud-specific tooling and proxy instructions are saved in the environment start
 - Follow-up saves atomically update the person's outcome, append an attributed note and write a minimal audit event. A request ID makes retries idempotent. A revision check rejects stale edits; the screen tells you to retain your draft and reload.
 - Notes and dates live in Postgres. The browser stores the managed sign-in session, not a copy of the organisation's database. Sign-out clears the app's query cache. Screens poll for changes; revocation can take up to the next poll to disappear visually, while database access is denied immediately.
 - Wrong-number and Do-not-contact outcomes suppress contact links. Opening a call or WhatsApp does not claim a conversation happened or send a message automatically. Callback dates use the database's London date.
-- This is the first connected feature, not a completed production MVP. Backups/restore drills, deployment, monitoring, invitation/reset flows and the remaining feature backends are outstanding. Review those before operational use with real church records.
+- This is the first connected feature, not a completed production MVP. Backups/restore drills, deployment, monitoring, administrator invitation management and the remaining feature backends are outstanding. Review those before operational use with real church records.
+
+Password changes require matching inputs of at least 12 characters. Existing authenticator factors must be verified before a password reset. Expired or reused links show an error rather than turning an already-signed-in account into a recovery session. The in-progress password step survives refresh in that tab; it stores only the account ID and step in session storage, not the password or an extra access token.
