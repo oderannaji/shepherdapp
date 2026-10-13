@@ -1,8 +1,8 @@
 # Shepherd
 
-An interactive, fictional UI prototype for Dominion City Manchester. No real authentication, security enforcement, calling, messaging, production database or durable persistence is implemented.
+A modular church-care app for Dominion City Manchester. The default mode is the fictional interactive demo. Connected mode adds Supabase sign-in, database permissions, people and persistent follow-up notes. See [Supabase setup](SUPABASE-SETUP.md) for connection instructions, tests and the remaining work.
 
-## Routes
+## Demo routes
 
 - `/`: My people, search, due-date and outcome filters.
 - `/people/$id`: Contact detail, notes, outcomes and callbacks; safe demo call/WhatsApp previews.
@@ -22,9 +22,9 @@ Open a person, write a note, select an outcome/callback and save. Open Expected,
 
 Preview Admin with the clearly labelled role switcher. Import accepts a simple fictional CSV (first row headers, first column Name, second Phone; no quoted commas). Sample CSV is also available. Mapping, review and confirmation precede updates. Duplicate merging retains notes and updates Expected identity references; ambiguous attendance is reviewed in reconciliation. Assignments preview the resulting permanent workload. Walk-ins are separate from Expected counts. Invitations never send email.
 
-## Backend integration points
+## Remaining backend work
 
-Replace seed data and provider mutation methods with repository reads/writes. Add real authenticated session handling and server-enforced access controls separately; demo roles provide neither. Introduce canonical person/service attendance observations, import validation, transactional merge/assignment actions, concurrency/locking and durable audit records. Server reconciliation should resolve conflicts rather than silently choosing an observation. Add actual messaging integrations only with consent and safeguards.
+Connected identity and follow-up use independent Supabase reads, permissions and transactional saves. Demo roles remain presentation-only. Introduce canonical person/service attendance observations, import validation, transactional merge/assignment actions, concurrency/locking and durable audit records. Server reconciliation should resolve conflicts rather than silently choosing an observation. Add actual messaging integrations only with consent and safeguards.
 
 ## Verification
 

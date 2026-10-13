@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ContactDetail } from "@/features/shepherd/follow-up";
+import { connection } from "@/features/shepherd/identity";
+import { ConnectedContact, ContactDetail } from "@/features/shepherd/follow-up";
 export const Route = createFileRoute("/people/$id")({
   head: () => ({
     meta: [
@@ -18,5 +19,9 @@ export const Route = createFileRoute("/people/$id")({
 });
 function ContactPage() {
   const { id } = Route.useParams();
-  return <ContactDetail key={id} id={id} />;
+  return connection.mode === "demo" ? (
+    <ContactDetail key={id} id={id} />
+  ) : (
+    <ConnectedContact key={id} id={id} />
+  );
 }

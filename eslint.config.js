@@ -40,6 +40,7 @@ export default tseslint.config(
                 "../expected/*",
                 "../admin/*",
                 "../shared/*",
+                "../identity/*",
               ],
               message:
                 "Import Shepherd modules through their index.ts public API (for example, @/features/shepherd/expected). Use local relative imports inside a module.",

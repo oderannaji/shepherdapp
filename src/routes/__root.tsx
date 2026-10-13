@@ -10,6 +10,9 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 
+import { connection } from "@/features/shepherd/identity";
+import { ConnectedApp } from "@/features/shepherd/ConnectedApp";
+
 import appCss from "../styles.css?url";
 import { DemoProvider } from "@/features/shepherd/shared";
 import { Shell } from "@/features/shepherd/Shell";
@@ -132,11 +135,17 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <DemoProvider>
-        <Shell>
+      {connection.mode !== "demo" ? (
+        <ConnectedApp>
           <Outlet />
-        </Shell>
-      </DemoProvider>
+        </ConnectedApp>
+      ) : (
+        <DemoProvider>
+          <Shell>
+            <Outlet />
+          </Shell>
+        </DemoProvider>
+      )}
     </QueryClientProvider>
   );
 }

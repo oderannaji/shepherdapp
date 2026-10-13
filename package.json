@@ -11,7 +11,13 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "db:start": "supabase start -x realtime,storage-api,imgproxy,studio,edge-runtime,logflare,vector,supavisor,postgres-meta",
+    "db:stop": "supabase stop",
+    "db:migrate:local": "supabase migration up --local",
+    "db:fixtures": "node scripts/local-fixtures.mjs",
+    "dev:connected": "vite dev --mode connected",
+    "test:integration": "node --test scripts/backend.integration.test.mjs"
   },
   "overrides": {
     "rolldown": "1.2.1"
@@ -44,6 +50,7 @@
     "@radix-ui/react-toggle": "^1.1.10",
     "@radix-ui/react-toggle-group": "^1.1.11",
     "@radix-ui/react-tooltip": "^1.2.8",
+    "@supabase/supabase-js": "2.117.3",
     "@tailwindcss/vite": "^4.2.1",
     "@tanstack/react-query": "^5.101.1",
     "@tanstack/react-router": "1.170.41",
@@ -88,6 +95,7 @@
     "jsdom": "^20.0.3",
     "nitro": "3.0.260603-beta",
     "prettier": "^3.7.3",
+    "supabase": "2.120.0",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
     "vite": "8.1.5",

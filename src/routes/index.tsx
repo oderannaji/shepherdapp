@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { FollowUp } from "@/features/shepherd/follow-up";
+import { connection } from "@/features/shepherd/identity";
+import { ConnectedFollowUp, FollowUp } from "@/features/shepherd/follow-up";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
@@ -18,5 +19,5 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: FollowUp,
+  component: connection.mode === "demo" ? FollowUp : ConnectedFollowUp,
 });
