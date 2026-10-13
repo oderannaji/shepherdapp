@@ -16,6 +16,47 @@ test("real Supabase authentication, RLS and atomic follow-ups", async (t) => {
     p_callback_on: "2026-10-20",
     p_note: "Durable integration note",
   };
+  await t.test("anonymous function grants are explicitly removed even with hosted defaults", () => {
+    const query =
+      "select count(*) = 4 and bool_and(not has_function_privilege('anon', p.oid, 'execute') and has_function_privilege('authenticated', p.oid, 'execute')) from pg_proc p join pg_namespace n on n.oid=p.pronamespace where (n.nspname='public' and p.proname in ('shepherd_today','shepherd_record_follow_up','shepherd_create_person')) or (n.nspname='shepherd_private' and p.proname='has_access');";
+    const result = execFileSync(
+      "docker",
+      [
+        "exec",
+        "supabase_db_shepherdapp",
+        "psql",
+        "-U",
+        "postgres",
+        "-d",
+        "postgres",
+        "-Atc",
+        query,
+      ],
+      { encoding: "utf8" },
+    ).trim();
+    assert.equal(result, "t");
+  });
+  await t.test(
+    "a prepared account can verify an invitation and set its own first password",
+    async () => {
+      const email = `prepared-${randomUUID()}@shepherd.test`;
+      const pending = checked(await admin.auth.admin.createUser({ email, email_confirm: false }));
+      assert.ok(!pending.user.email_confirmed_at);
+      const invitation = checked(await admin.auth.admin.generateLink({ type: "invite", email }));
+      const client = makeClient();
+      const verified = checked(
+        await client.auth.verifyOtp({
+          token_hash: invitation.properties.hashed_token,
+          type: "invite",
+        }),
+      );
+      assert.ok(verified.user.email_confirmed_at);
+      const password = randomUUID() + randomUUID();
+      checked(await client.auth.updateUser({ password }));
+      const signedIn = checked(await makeClient().auth.signInWithPassword({ email, password }));
+      assert.equal(signedIn.user.id, pending.user.id);
+    },
+  );
   await t.test("anonymous requests and public signup cannot access the workspace", async () => {
     const anonymous = makeClient();
     const read = await anonymous.from("shepherd_people").select("*");

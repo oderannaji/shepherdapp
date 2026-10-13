@@ -17,7 +17,8 @@
     "db:migrate:local": "supabase migration up --local",
     "db:fixtures": "node scripts/local-fixtures.mjs",
     "dev:connected": "vite dev --mode connected",
-    "test:integration": "node --test scripts/backend.integration.test.mjs"
+    "test:integration": "node --test scripts/backend.integration.test.mjs",
+    "check:hosted": "node --use-env-proxy scripts/hosted-preflight.mjs"
   },
   "overrides": {
     "rolldown": "1.2.1"

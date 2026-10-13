@@ -27,7 +27,7 @@ export async function managementRequest(path, body) {
     });
   } catch {
     throw new Error(
-      "Could not reach Supabase management API. Check applied network/access settings.",
+      "Could not reach Supabase management API. Run with node --use-env-proxy in this cloud environment and check applied network/access settings.",
     );
   }
   if (!response.ok)
