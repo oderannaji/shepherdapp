@@ -56,12 +56,12 @@ For invitation and recovery coverage, run `SUPABASE_HOME=/workspace/.cache/supab
 
 ## Permission and storage behaviour
 
-- Anonymous and unconfirmed accounts cannot read contacts. Volunteers can read and update only their own assigned contacts. Database checks run on every request, including direct API requests. Deactivating membership blocks subsequent API access with an already-issued token.
+- Anonymous and unconfirmed accounts cannot read contacts. Volunteers can read and update contacts assigned to them permanently or through a current weekly Recovery assignment. Database checks run on every request, including direct API requests. Deactivating membership blocks subsequent API access with an already-issued token.
 - Administrators must have an active membership and an `aal2` session (verified MFA) before reading contacts or creating people. Cross-organisation access stays blocked.
 - Follow-up saves atomically update the person's outcome, append an attributed note and write a minimal audit event. A request ID makes retries idempotent. A revision check rejects stale edits; the screen tells you to retain your draft and reload.
 - Notes and dates live in Postgres. The browser stores the managed sign-in session, not a copy of the organisation's database. Sign-out clears the app's query cache. Screens poll for changes; revocation can take up to the next poll to disappear visually, while database access is denied immediately.
 - Wrong-number and Do-not-contact outcomes suppress contact links. Opening a call or WhatsApp does not claim a conversation happened or send a message automatically. Callback dates use the database's London date.
-- This is the first connected feature, not a completed production MVP. Backups/restore drills, website deployment, production email delivery, monitoring and real-user acceptance testing are outstanding. Review those before operational use with real church records.
+- The connected workflows are implemented; production launch still needs backups/restore drills, website deployment, production email delivery, monitoring and real-user acceptance testing. Complete these before operational use with real church records.
 
 Password changes require matching inputs of at least 12 characters. Existing authenticator factors must be verified before a password reset. Expired or reused links show an error rather than turning an already-signed-in account into a recovery session. The in-progress password step survives refresh in that tab; it stores only the account ID and step in session storage, not the password or an extra access token.
 
@@ -73,7 +73,7 @@ For the additional local browser suite, start the local invitation endpoint in a
 
 ```bash
 printf '%s\n' 'SHEPHERD_APP_ORIGINS=http://127.0.0.1:3001,http://localhost:3000,http://127.0.0.1:3000' > .local/functions.env
-supabase functions serve account-admin --env-file .local/functions.env --no-verify-jwt
+bunx supabase functions serve account-admin --env-file .local/functions.env --no-verify-jwt
 ```
 
 Then create fresh fixtures and run `CHROMIUM_PATH=/usr/bin/chromium python scripts/browser-workspace.py` in the cloud. It covers administrator MFA, service creation, volunteer isolation, Expected publication and locking, attendance reconciliation, Recovery, imports, assignments, access removal, local invitations and audit history. Local mail goes to the mail catcher. Run fixture-writing browser suites sequentially because they share ignored fixture files.
