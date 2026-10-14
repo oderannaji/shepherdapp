@@ -1,5 +1,5 @@
 export function readConnection(env: Record<string, string | undefined>) {
-  const mode = env["VITE_APP_MODE"] || "demo";
+  const mode = env["VITE_APP_MODE"] || "connected";
   if (mode === "demo") return { mode: "demo" as const };
   if (mode !== "connected")
     return { mode: "invalid" as const, error: "VITE_APP_MODE must be demo or connected." };

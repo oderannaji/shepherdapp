@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { randomBytes, randomUUID, createHmac } from "node:crypto";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, writeFile, readFile } from "node:fs/promises";
 import { createClient } from "@supabase/supabase-js";
 
 // Deliberately reads local CLI status, never a supplied hosted URL or service key.
@@ -113,11 +113,12 @@ export async function makeFixtures() {
     JSON.stringify({ org, otherOrg, person, colleaguePerson, outsiderPerson, users: accounts }),
     { mode: 0o600 },
   );
-  await writeFile(
-    ".env.connected.local",
-    `VITE_APP_MODE=connected\nVITE_SUPABASE_URL=${status.API_URL}\nVITE_SUPABASE_PUBLISHABLE_KEY=${status.ANON_KEY}\n`,
-    { mode: 0o600 },
-  );
+  const connectionFile = `VITE_APP_MODE=connected\nVITE_SUPABASE_URL=${status.API_URL}\nVITE_SUPABASE_PUBLISHABLE_KEY=${status.ANON_KEY}\n`;
+  const previousConnection = await readFile(".env.connected.local", "utf8").catch(() => "");
+  if (previousConnection !== connectionFile) {
+    await writeFile(".env.connected.local", connectionFile, { mode: 0o600 });
+  }
+
   return { ...backend, org, otherOrg, person, colleaguePerson, outsiderPerson, users };
 }
 if (process.argv[1]?.endsWith("/local-fixtures.mjs")) {

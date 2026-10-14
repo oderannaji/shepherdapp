@@ -1,5 +1,6 @@
+import { connection } from "@/features/shepherd/identity";
 import { createFileRoute } from "@tanstack/react-router";
-import { Recovery } from "@/features/shepherd/recovery";
+import { Recovery, ConnectedRecovery } from "@/features/shepherd/recovery";
 export const Route = createFileRoute("/recovery")({
   head: () => ({
     meta: [
@@ -15,5 +16,5 @@ export const Route = createFileRoute("/recovery")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: Recovery,
+  component: connection.mode === "demo" ? Recovery : ConnectedRecovery,
 });

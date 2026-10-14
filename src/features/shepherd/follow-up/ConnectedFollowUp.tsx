@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, useRef, type FormEvent } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useWorkspace, membershipSchema } from "../identity";
@@ -136,16 +136,13 @@ export function ConnectedFollowUp() {
           </div>
         </>
       )}
-      <p className="connected-muted">
-        Connected features: people and follow-up notes. Recovery, Expected, attendance imports and
-        user administration are still being built.
-      </p>
     </>
   );
 }
 function CreatePerson({ onCreated }: { onCreated: () => void }) {
   const { client, membership } = useWorkspace();
   const queryClient = useQueryClient();
+  const retry = useRef({ payload: "", id: "" });
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [owner, setOwner] = useState(membership.user_id);
@@ -170,7 +167,10 @@ function CreatePerson({ onCreated }: { onCreated: () => void }) {
     setBusy(true);
     setError("");
     try {
-      const r = await client.rpc("shepherd_create_person", {
+      const payload = JSON.stringify({ name, phone, owner });
+      if (retry.current.payload !== payload) retry.current = { payload, id: crypto.randomUUID() };
+      const r = await client.rpc("shepherd_create_person_once", {
+        p_request_id: retry.current.id,
         p_organisation_id: membership.organisation_id,
         p_full_name: name.trim(),
         p_phone_e164: phone.trim(),
@@ -181,7 +181,7 @@ function CreatePerson({ onCreated }: { onCreated: () => void }) {
       onCreated();
     } catch {
       setError(
-        "Could not confirm creation. Check the people list before retrying. Use an international phone number and an active owner.",
+        "Could not confirm creation. Your draft is still here; retrying the same details is safe. Use an international phone number and an active owner.",
       );
     } finally {
       setBusy(false);

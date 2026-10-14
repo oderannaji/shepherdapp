@@ -34,7 +34,8 @@ export async function managementRequest(path, body) {
     throw new Error(
       `Supabase management API returned HTTP ${response.status}. No credential values have been logged.`,
     );
-  return response.json();
+  const text = await response.text();
+  return text ? JSON.parse(text) : null;
 }
 export async function preflight(adminEmail) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adminEmail ?? ""))

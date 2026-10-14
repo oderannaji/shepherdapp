@@ -113,7 +113,7 @@ test("real Supabase authentication, RLS and atomic follow-ups", async (t) => {
       assert.ok(
         (await owner.from("shepherd_contact_attempts").insert({ person_id: person })).error,
       );
-      assert.ok((await owner.from("shepherd_audit_events").select("*")).error);
+      assert.deepEqual(checked(await owner.from("shepherd_audit_events").select("*")), []);
     },
   );
   await t.test(

@@ -1,10 +1,12 @@
 import { useState, type FormEvent } from "react";
+import { Link, useRouterState } from "@tanstack/react-router";
 import type { Session, SupabaseClient } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
 import { Mfa } from "./Mfa";
 import { passwordProblem, type PasswordAction } from "./password-action";
 
 export function SignIn({ client, initialError }: { client: SupabaseClient; initialError: string }) {
+  const adminEntry = useRouterState({ select: (s) => s.location.pathname.startsWith("/admin/") });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(initialError);
@@ -38,11 +40,19 @@ export function SignIn({ client, initialError }: { client: SupabaseClient; initi
     <main className="connected-center">
       <section className="connected-card">
         <p className="connected-brand">Shepherd</p>
-        <h1>{reset ? "Reset your password" : "Welcome back"}</h1>
+        <h1>
+          {reset
+            ? "Reset your password"
+            : adminEntry
+              ? "Administrator sign in"
+              : "Volunteer sign in"}
+        </h1>
         <p>
           {reset
             ? "Enter the email address you use for Shepherd."
-            : "Sign in with your church account."}
+            : adminEntry
+              ? "Use your administrator account. Authenticator verification is required."
+              : "Use the email your administrator invited."}
         </p>
         {sent ? (
           <p role="status">
@@ -96,6 +106,13 @@ export function SignIn({ client, initialError }: { client: SupabaseClient; initi
           </button>
         </div>
         <p className="connected-muted">Need an account? Contact your church administrator.</p>
+        {adminEntry ? (
+          <Link to="/">Volunteer sign in</Link>
+        ) : (
+          <Link to="/admin/$section" params={{ section: "overview" }}>
+            Administrator sign in
+          </Link>
+        )}
       </section>
     </main>
   );

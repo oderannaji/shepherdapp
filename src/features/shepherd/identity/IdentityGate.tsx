@@ -192,8 +192,8 @@ function MembershipGate({
   else if (!membership || !session.user.email_confirmed_at)
     content = (
       <p role="alert">
-        This account has no active Shepherd workspace. Ask your administrator to confirm your email
-        and membership.
+        This account has no active Shepherd workspace. Verify your invitation email or ask your
+        administrator to check your workspace access.
       </p>
     );
   else if (

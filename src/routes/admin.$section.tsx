@@ -1,5 +1,6 @@
+import { connection } from "@/features/shepherd/identity";
 import { createFileRoute } from "@tanstack/react-router";
-import { Admin } from "@/features/shepherd/admin";
+import { Admin, ConnectedAdmin } from "@/features/shepherd/admin";
 export const Route = createFileRoute("/admin/$section")({
   head: ({ params }) => ({
     meta: [
@@ -23,5 +24,9 @@ export const Route = createFileRoute("/admin/$section")({
 });
 function AdminPage() {
   const { section } = Route.useParams();
-  return <Admin key={section} section={section} />;
+  return connection.mode === "demo" ? (
+    <Admin key={section} section={section} />
+  ) : (
+    <ConnectedAdmin key={section} section={section} />
+  );
 }

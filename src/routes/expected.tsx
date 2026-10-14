@@ -1,5 +1,6 @@
+import { connection } from "@/features/shepherd/identity";
 import { createFileRoute } from "@tanstack/react-router";
-import { Expected } from "@/features/shepherd/expected";
+import { Expected, ConnectedExpected } from "@/features/shepherd/expected";
 export const Route = createFileRoute("/expected")({
   head: () => ({
     meta: [
@@ -18,5 +19,5 @@ export const Route = createFileRoute("/expected")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: Expected,
+  component: connection.mode === "demo" ? Expected : ConnectedExpected,
 });

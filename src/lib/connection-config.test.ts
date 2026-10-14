@@ -6,8 +6,9 @@ const publicEnv = {
   VITE_SUPABASE_PUBLISHABLE_KEY: "sb_publishable_test_public_key",
 };
 describe("connected configuration", () => {
-  it("defaults to demo only when connected mode was not requested", () => {
-    expect(readConnection({}).mode).toBe("demo");
+  it("requires explicit demo mode and otherwise fails closed", () => {
+    expect(readConnection({}).mode).toBe("invalid");
+    expect(readConnection({ VITE_APP_MODE: "demo" }).mode).toBe("demo");
     expect(readConnection({ VITE_APP_MODE: "connected" }).mode).toBe("invalid");
     expect(readConnection({ VITE_APP_MODE: "production" }).mode).toBe("invalid");
   });

@@ -21,3 +21,12 @@ export {
   type Entry,
   type Post,
 } from "./model";
+export { readRows, readServices, readPeople, consecutiveAbsences } from "./connected-data";
+export type {
+  Service,
+  Contact,
+  WorkspaceMember,
+  AttendanceRow,
+  ExpectedEntry,
+  ExpectedList,
+} from "./connected-data";
